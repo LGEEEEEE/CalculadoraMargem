@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Consignado - Pela Parcela</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            max-width: 500px;
+            width: 100%;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        p.subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 12px;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .results {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px dashed var(--border-color);
+            display: none;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .result-item .label {
+            color: var(--text-muted);
+        }
+
+        .result-item .value {
+            font-weight: 600;
+        }
+
+        .highlight-card {
+            background: rgba(16, 185, 129, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .highlight-card .main-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            display: block;
+        }
+
+        .highlight-card .main-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .info-footer {
+            margin-top: 24px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            text-align: justify;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Simulador de Crédito (Inverso)</h1>
+    <p class="subtitle">Cálculo do Valor Liberado a partir da Parcela</p>
+
+    <div class="input-group">
+        <label for="parcela">Valor da Parcela</label>
+        <div class="input-wrapper">
+            <span>R$</span>
+            <input type="number" id="parcela" placeholder="Ex: 300.00" step="0.01">
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label for="taxa">Taxa de Juros Mensal (%)</label>
+        <div class="input-wrapper">
+            <span>%</span>
+            <input type="number" id="taxa" placeholder="Ex: 1.60" step="0.01">
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label for="prazo">Prazo (Meses)</label>
+        <div class="input-wrapper">
+            <span>📅</span>
+            <input type="number" id="prazo" placeholder="Ex: 96">
+        </div>
+    </div>
+
+    <button onclick="calcularReverso()">Calcular Valor Liberado</button>
+
+    <div id="results" class="results">
+        <div class="result-item">
+            <span class="label">Valor Bruto Financiado:</span>
+            <span class="value" id="res-bruto">R$ 0,00</span>
+        </div>
+        <div class="result-item">
+            <span class="label">IOF Total Retido:</span>
+            <span class="value" id="res-iof">R$ 0,00</span>
+        </div>
+        
+        <div class="highlight-card">
+            <span class="main-label">Valor Líquido (Liberado na Conta)</span>
+            <span class="main-value" id="res-liberado">R$ 0,00</span>
+        </div>
+
+        <div class="result-item" style="margin-top: 16px;">
+            <span class="label">Custo Total ao Final:</span>
+            <span class="value" id="res-total">R$ 0,00</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function formatCurrency(value) {
+        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calcularReverso() {
+        const parcela = parseFloat(document.getElementById('parcela').value);
+        const taxaJurosMensal = parseFloat(document.getElementById('taxa').value) / 100;
+        const prazoMeses = parseInt(document.getElementById('prazo').value);
+
+        if (isNaN(parcela) || isNaN(taxaJurosMensal) || isNaN(prazoMeses)) {
+            alert("Por favor, preencha todos os campos corretamente.");
+            return;
+        }
+
+        // 1. Tabela Price Reversa: Encontrar o Valor Bruto Financiado (PV)
+        // Fórmula: PV = PMT * (1 - (1 + i)^-n) / i
+        const valorFinanciado = parcela * (1 - Math.pow(1 + taxaJurosMensal, -prazoMeses)) / taxaJurosMensal;
+
+        // 2. Cálculo da Alíquota de IOF Total
+        const iofFixo = 0.0038;
+        const iofDiario = 0.000082;
+        const diasTributados = Math.min(prazoMeses * 30, 365);
+        const aliquotaIofTotal = iofFixo + (diasTributados * iofDiario);
+
+        // 3. Encontrar o Valor Líquido (Liberado na conta)
+        // Se: Valor Financiado = Valor Liberado / (1 - Aliquota)
+        // Então: Valor Liberado = Valor Financiado * (1 - Aliquota)
+        const valorLiberado = valorFinanciado * (1 - aliquotaIofTotal);
+        
+        // 4. Encontrar o IOF em Reais
+        const valorIof = valorFinanciado - valorLiberado;
+
+        const totalPago = parcela * prazoMeses;
+
+        // Atualizar UI
+        document.getElementById('res-bruto').innerText = formatCurrency(valorFinanciado);
+        document.getElementById('res-iof').innerText = formatCurrency(valorIof);
+        document.getElementById('res-liberado').innerText = formatCurrency(valorLiberado);
+        document.getElementById('res-total').innerText = formatCurrency(totalPago);
+
+        document.getElementById('results').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
